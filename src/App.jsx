@@ -3,12 +3,14 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import './App.css'
 import SignIn from './SignIn.tsx'
 import Redirect from './redirect.jsx'
+import Welcome from "./welcome.jsx"
 
 function App(){
   return(
         <Routes>
-          <Route exact path="/" element={<SignIn/>}/>
-          <Route path="/redirect" element={<Redirect/>} />
+          <Route path='/' element={<Welcome/>}/>
+          <Route path="/login" element={<SignIn/>}/>
+          <Route path="/redirect" element={<Redirect/>} />          
         </Routes>
   ) 
 }

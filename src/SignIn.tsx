@@ -26,11 +26,18 @@ const defaultTheme = createTheme();
 
 export default function SignIn() {
   
+  const [formValues, setFormValues] = useState({
+    email: '',
+    password: ''
+  })
+
   const navigate = useNavigate();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    
     const data = new FormData(event.currentTarget);
+  
     const user = data.get('email') as string;
     const pass = data.get('password') as string;
     
@@ -50,11 +57,24 @@ export default function SignIn() {
     //redireccionar a otra pag
     
     navigate('/redirect');
-    console.log({
-      email: user,
-      password: pass,
+  
+  };
+
+  
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues({
+      ...formValues,
+      [name]: value
     });
   };
+
+  const handleClean = () =>{
+    setFormValues({
+      email: '',
+      password: ''
+    });
+  }
 
 
   return (
@@ -81,7 +101,8 @@ export default function SignIn() {
               margin="normal"
               required
               fullWidth
-              id="email"
+              value={formValues.email}
+              onChange={handleInputChange}
               label="Email Address"
               name="email"
               autoComplete="email"
@@ -97,7 +118,8 @@ export default function SignIn() {
               name="password"
               label="Password"
               type="password"
-              id="password"
+              value={formValues.password}
+              onChange={handleInputChange}
               autoComplete="current-password"
             />
             <FormControlLabel
@@ -111,6 +133,12 @@ export default function SignIn() {
               sx={{ mt: 3, mb: 2 }}
             >
               Sign In
+            </Button>
+            <Button
+              type='button'
+              onClick={handleClean}
+            > 
+              Borrar 
             </Button>
             <Grid container>
               <Grid item xs>
