@@ -1,10 +1,12 @@
 import React, { useState} from 'react';
-import {Avatar, Button, Typography, Container, Box, Grid, Link, Checkbox, FormControlLabel, TextField, CssBaseline} from '@mui/material';
-import {LockOutlined} from '@mui/icons-material';
+import {Avatar, Button, Typography, Container, Box, Grid, Link, Checkbox, FormControlLabel, TextField, CssBaseline, FormGroup} from '@mui/material';
+import {ErrorSharp, LockOutlined, Password} from '@mui/icons-material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import './App.css'
+import './signin.css'
 import './redirect.jsx'
 import { BrowserRouter as Router, useNavigate} from 'react-router-dom'
+import * as Yup from "yup"
+import { Formik, Field, Form, ErrorMessage, useFormik, validateYupSchema } from 'formik';
 
 
 
@@ -20,143 +22,128 @@ function Copyright(props: any) {
     </Typography>
   );
 }
-
-// TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
-export default function SignIn() {
-  
-  const [formValues, setFormValues] = useState({
-    email: '',
-    password: ''
-  })
+function SignIn() {
 
-  const navigate = useNavigate();
+const navigate = useNavigate();
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    
-    const data = new FormData(event.currentTarget);
-  
-    const user = data.get('email') as string;
-    const pass = data.get('password') as string;
-    
-
-    if(user === ""){
-      alert("El usuario no puede ser vacio");
-      return;
-    }
-
-    if(pass.length < 6){
-      alert("La contraseña tiene que tener mas de 6 caracteres");
-      return;
-    }
-
+  const enviarForm = () =>{
+    navigate("/redirect");
     console.log("CHECK");
-  
-    //redireccionar a otra pag
+}
+
+  const {handleSubmit, handleChange, values, errors} = useFormik({
+    initialValues:{
+        Email: "",
+        Password: ""
+    },
     
-    navigate('/redirect');
-  
-  };
+    validationSchema: Yup.object({
+      Email: Yup.string()
+        .required("Campo Requerido")
+        .email("Correo electronico invalido")
+        .max(255, "Maximo 255 caracteres"),
+      Password: Yup.string()
+        .required("Campo Requerido")
+        .min(5, "Minimo 5 caracteres"),
+    }),
 
-  
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormValues({
-      ...formValues,
-      [name]: value
-    });
-  };
+    onSubmit: enviarForm
 
-  const handleClean = () =>{
-    setFormValues({
-      email: '',
-      password: ''
-    });
-  }
+})
 
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      <div className='contenedor1'>
-      <Container component="main" maxWidth="xs" >
-        <CssBaseline />
-        <Box
-          sx={{
-            marginTop: 8,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-          }}
-        >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlined />
-          </Avatar>
-          <Typography component="h1" variant="h5">
-            Sign in
-          </Typography>
-          <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              value={formValues.email}
-              onChange={handleInputChange}
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              helperText={"Requerido"}
-              error={true}
-            />
+        <Container component="main" maxWidth="xs" >
+          <CssBaseline />
+          <Box
+            sx={{
+              marginTop: 8,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >
+            <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
+              <LockOutlined />
+            </Avatar>
 
-            <TextField
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              value={formValues.password}
-              onChange={handleInputChange}
-              autoComplete="current-password"
-            />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Sign In
-            </Button>
-            <Button
-              type='button'
-              onClick={handleClean}
-            > 
-              Borrar 
-            </Button>
-            <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
-                </Link>
+            <Typography component="h1" variant="h5">
+              Sign in
+            </Typography>
+
+            <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+
+              <TextField
+                margin="normal"
+                fullWidth
+                onChange={handleChange}
+                label="Email Address"
+                name="Email"
+                autoComplete="email"
+                value= {values.Email}
+                error ={!!errors.Email}
+                helperText={errors.Email}
+                
+              />
+             
+              <TextField
+                 
+                margin="normal"
+                fullWidth
+                name="Password"
+                label="Password"
+                type="password"
+                onChange={handleChange}
+                autoComplete="current-password"
+                value = {values.Password}
+                error = {!!errors.Password}
+                helperText={errors.Password}
+              />
+
+            
+              <FormControlLabel
+                control={<Checkbox value="remember" color="primary" />}
+                label="Remember me"
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }}
+              >
+                Sign In
+              </Button>
+              <Button
+                type='button'
+                //onClick={handleClean}
+              > 
+                Reset
+              </Button>
+
+
+              <Grid container>
+                <Grid item xs>
+                  <Link href="#" variant="body2">
+                    Forgot password?
+                  </Link>
+                </Grid>
+                <Grid item>
+                  <Link href="./redirect.jsx" variant="body2">
+                    {"Don't have an account? Sign Up"}
+                  </Link>
+                </Grid>
               </Grid>
-              <Grid item>
-                <Link href="./redirect.jsx" variant="body2">
-                  {"Don't have an account? Sign Up"}
-                </Link>
-              </Grid>
-            </Grid>
+            </Box>
           </Box>
-        </Box>
-        <Copyright sx={{ mt: 8, mb: 4 }} />
-      </Container>
-      </div>
+          <Copyright sx={{ mt: 8, mb: 4 }} />
+        </Container>
+        
     </ThemeProvider>
-  );
-}
+  );  
+} 
+
+
+export default SignIn;

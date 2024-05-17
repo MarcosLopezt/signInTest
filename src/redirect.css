@@ -1,0 +1,23 @@
+.field-error.text-danger{
+    color:rgb(238, 13, 13);
+    font-size: 14px;
+}
+
+.contenedor-inputs{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 400px;
+    height: 70px;
+}
+
+.label-inp{
+    display: flex;
+}
+
+.form-control{
+    display: flex;
+    padding: 8px;
+    width: 60%;
+    margin-top: 10px;
+}
