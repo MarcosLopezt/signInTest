@@ -1,12 +1,16 @@
 import React, { useState} from 'react';
 import {Avatar, Button, Typography, Container, Box, Grid, Link, Checkbox, FormControlLabel, TextField, CssBaseline, FormGroup} from '@mui/material';
-import {ErrorSharp, LockOutlined, Password} from '@mui/icons-material';
+import {Email, LockOutlined} from '@mui/icons-material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import './signin.css'
 import './redirect.jsx'
 import { BrowserRouter as Router, useNavigate} from 'react-router-dom'
 import * as Yup from "yup"
-import { Formik, Field, Form, ErrorMessage, useFormik, validateYupSchema } from 'formik';
+import { useFormik } from 'formik';
+
+import {gapi} from "gapi-script"
+import GoogleLogin from 'react-google-login'
+import { useEffect } from 'react'
 
 
 
@@ -24,13 +28,47 @@ function Copyright(props: any) {
 }
 const defaultTheme = createTheme();
 
+const usuarios = [
+  {email: "marcos.lopez@gmail", password: "12345"},
+  {email: "marcos.lopez@mindfactory.ar", password: "12345"},
+  {email: "marc12@gmail" , password:"11111" },
+];
+
+
 function SignIn() {
 
 const navigate = useNavigate();
+const clientID = "826431473382-0rud95i8jtuvrn6eofo9uehu8dmrbp6p.apps.googleusercontent.com";
 
-  const enviarForm = () =>{
-    navigate("/redirect");
-    console.log("CHECK");
+useEffect(() => {
+  const start = () =>{
+    gapi.auth2.init({
+      client_id: clientID,
+        
+    });
+  };
+
+  gapi.load("client:auth2", start);
+}, [clientID]);
+
+const onSuccess = (response) =>{
+  navigate("/redirect");
+  console.log(response);
+  
+}
+
+const onFailure = () =>{
+  console.log("error");
+}
+
+  const enviarForm = (values) =>{
+    const userValid = usuarios.find((usuario) => usuario.email === values.Email && usuario.password === values.Password);
+    if(userValid){
+      navigate("/redirect");
+    }else{
+      console.log("FALSE");
+    }
+    
 }
 
   const {handleSubmit, handleChange, values, errors} = useFormik({
@@ -41,11 +79,11 @@ const navigate = useNavigate();
     
     validationSchema: Yup.object({
       Email: Yup.string()
-        .required("Campo Requerido")
+        .required("¡Campo Requerido!")
         .email("Correo electronico invalido")
         .max(255, "Maximo 255 caracteres"),
       Password: Yup.string()
-        .required("Campo Requerido")
+        .required("¡Campo Requerido!")
         .min(5, "Minimo 5 caracteres"),
     }),
 
@@ -55,6 +93,7 @@ const navigate = useNavigate();
 
 
   return (
+
     <ThemeProvider theme={defaultTheme}>
         <Container component="main" maxWidth="xs" >
           <CssBaseline />
@@ -86,7 +125,6 @@ const navigate = useNavigate();
                 value= {values.Email}
                 error ={!!errors.Email}
                 helperText={errors.Email}
-                
               />
              
               <TextField
@@ -103,7 +141,6 @@ const navigate = useNavigate();
                 helperText={errors.Password}
               />
 
-            
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
                 label="Remember me"
@@ -116,13 +153,21 @@ const navigate = useNavigate();
               >
                 Sign In
               </Button>
+              <div className='btn'>
+              <GoogleLogin 
+                clientId={clientID}
+                buttonText='Login with Google'
+                onSuccess={onSuccess}
+                onFailure={onFailure}
+                cookiePolicy={'single_host_policy'}
+              />
+              </div>
               <Button
                 type='button'
                 //onClick={handleClean}
               > 
                 Reset
               </Button>
-
 
               <Grid container>
                 <Grid item xs>
